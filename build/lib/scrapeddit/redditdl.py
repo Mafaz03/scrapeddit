@@ -1,12 +1,38 @@
-from PIL import UnidentifiedImageError
 
-class InvalidSubreddit(Exception):
-    pass
-class RestrictedSubreddit(Exception):
-    pass
+from datetime import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sb
+import praw
+import pandas as pd
+from tqdm import tqdm
+import requests
+from PIL import Image
+from torchvision import transforms
+from io import BytesIO
+import numpy as np
+import seaborn as sns
+from collections import Counter
+
+import torch
+from torch.utils.data import Dataset, DataLoader
+import requests
+from PIL import Image
+from io import BytesIO
+import numpy as np
+from tqdm import tqdm
+import torchvision.transforms as transforms
+from torchinfo import summary
+from authentication import *
+import authentication
+auths = authentication.auths[0]
+
+from PIL import UnidentifiedImageError
 
 class ScrapeditDataset(Dataset):
   def __init__(self, subreddit: list, limit=10, sortby='year', show_safe=None, max_size=500, transform=None):
+    if len(auths) == 0: raise IncompleteAuth("Complete Authentication by calling `authentication.auth_reddit` before proceeding")
+    reddit = auths[0]
     if transform: self.transform = transform
     else: self.transform = transforms.ToTensor()
     self.subreddit = subreddit

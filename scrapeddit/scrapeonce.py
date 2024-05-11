@@ -1,16 +1,24 @@
-reddit = praw.Reddit(client_id = "",
-            client_secret = "",
-            username = '',
-            password = '',
-            redirect_uri = "",
-            user_agent = "",
-            check_for_async=False)
+from tqdm import tqdm
+import praw
+from datetime import datetime
+import pandas as pd
+from authentication import *
+import authentication
+
+auths = authentication.auths[0]
 
 def scrape_reddit(subreddit: str, limit = 10, sortby = 'year', show_safe = None):
+  if len(auths) == 0: raise IncompleteAuth("Complete Authentication by calling `authentication.auth_reddit` before proceeding")
+  reddit = auths[0]
   sub = reddit.subreddit(subreddit)
+  try:
+    sub_type = sub.subreddit_type
+    if sub_type != 'public':
+      raise RestrictedSubreddit(f"r/{subreddit} is restricted to public access")
+  except: raise InvalidSubreddit(f"r/{subreddit} is invalid Subreddit, make sure the subreddit is valid")
   result = []
   sub_itter = sub.top(sortby,limit = limit)
-  for submission in tqdm(sub_itter):
+  for submission in tqdm(sub_itter, total = limit):
     d = {}
     d['id'] = submission.id
     d['title'] = submission.title

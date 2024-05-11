@@ -1,10 +1,10 @@
 LICENSE.txt
 README.md
 setup.py
-scrapeddit/Dataset.py
 scrapeddit/__init__.py
+scrapeddit/authentication.py
 scrapeddit/redditdl.py
-scrapeddit/scrapedit.py
+scrapeddit/scrapeonce.py
 scrapeddit/showit.py
 scrapeddit/transforms.py
 scrapeddit.egg-info/PKG-INFO
