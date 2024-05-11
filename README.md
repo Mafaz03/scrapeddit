@@ -1,59 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-  <h1>Scrapeddit</h1>
+# Scrapeddit
 
-  <h2>Overview</h2>
+## Overview
 
-  <p>Scrapeddit is a Python class designed for scraping images from Reddit subreddits and creating PyTorch datasets. It facilitates the collection of image data from various subreddits, allowing for easy integration into machine learning pipelines or data analysis projects.</p>
+Scrapeddit is a Python class designed for scraping images from Reddit subreddits and creating PyTorch datasets. It facilitates the collection of image data from various subreddits, allowing for easy integration into machine learning pipelines or data analysis projects.
 
-  <h2>Key Features</h2>
+## Key Features
 
-  <ul>
-    <li><strong>Reddit Scraping:</strong> Automatically retrieves image URLs from specified subreddits using the PRAW library.</li>
-    <li><strong>Flexible Configuration:</strong> Users can customize parameters such as subreddit names, post limits, sorting methods, and content safety filters.</li>
-    <li><strong>Data Transformation:</strong> Supports image transformation and resizing to fit specific requirements.</li>
-    <li><strong>Error Handling:</strong> Handles invalid subreddits, restricted subreddits, and failed image fetching gracefully, ensuring smooth data collection.</li>
-    <li><strong>Data Visualization:</strong> Provides visualization tools to understand the distribution of data sources across different subreddits.</li>
-  </ul>
+- **Reddit Scraping:** Automatically retrieves image URLs from specified subreddits using the PRAW library.
+- **Flexible Configuration:** Users can customize parameters such as subreddit names, post limits, sorting methods, and content safety filters.
+- **Data Transformation:** Supports image transformation and resizing to fit specific requirements.
+- **Error Handling:** Handles invalid subreddits, restricted subreddits, and failed image fetching gracefully, ensuring smooth data collection.
+- **Data Visualization:** Provides visualization tools to understand the distribution of data sources across different subreddits.
 
-  <h2>Usage</h2>
+## Usage
+1. **Initialization:** Instantiate the ScrapeditDataset class with a list of subreddit names and optional parameters for customization.
+Install by:
+```
+pip install scrapeddit
+pip3 install scrapeddit
+```
 
-  <ol>
-    <li><strong>Initialization:</strong> Instantiate the ScrapeditDataset class with a list of subreddit names and optional parameters for customization.</li>
-    <li><strong>Data Loading:</strong> Access the dataset like any other PyTorch dataset, allowing for seamless integration into machine learning workflows.</li>
-    <li><strong>Data Analysis:</strong> Use the provided visualization functions to gain insights into the distribution of data sources and explore the collected dataset.</li>
-    <li><strong>Model Training:</strong> Utilize the ScrapeditDataset as a DataLoader for training machine learning models. Integrate it with PyTorch's DataLoader for efficient batch processing and model training.</li>
-  </ol>
+2. **Authentication:** Complete authentication by regestering and making a app in prawn, using that complete the authentication by:
+```
+from scrapeddit import authentication
+authentication.auth_reddit(client_id = "",
+                    client_secret = "",
+                    username = "",
+                    password = "",
+                    redirect_uri = "",
+                    user_agent = "",
+                    check_for_async=False
+)
+```
+3. **Getting Data:** This is for collecting information for only on subreddit, parameters like `limit`, `show_safe` can be set
+```
+from scrapeddit import scrapeonce
+scrape_df = scrapeonce.scrape_reddit('spotted', limit = 50)
+```
+4. **Data Loading:** Access the dataset like any other PyTorch dataset, allowing for seamless integration into machine learning workflows.
+Highly recommemded: Use the provided `ResizeWithPadding` tranform
+```
+from scrapeddit import redditdl
+from scrapeddit.redditdl import ScrapeditDataset
+from scrapeddit.transforms import ResizeWithPadding
+import torchvision.transforms as transforms
 
-  <h2>Requirements</h2>
+size = 300
+transform_resize=transforms.Compose([
+                              ResizeWithPadding(size=size),
+                              transforms.Resize((size,size)),
+                              transforms.ToTensor()
+                              ])
 
-  <ul>
-    <li>Python 3.x</li>
-    <li>PRAW</li>
-    <li>pandas</li>
-    <li>requests</li>
-    <li>matplotlib</li>
-    <li>Pillow</li>
-    <li>torch</li>
-    <li>torchvision</li>
-    <li>tqdm</li>
-  </ul>
+subreddits = ['Pizza', 'burgers']
+dataset = ScrapeditDataset(subreddit=subreddits, limit = 200, transform = transform_resize, max_size = 100, show_safe = True)
+```
+Calling `dataset()` displays bar graph useful to visualize data imbalance caused due to data unavailability
+utilize `torch.utils.data.random_split()` to split into *train* and *test*
+5. **Data Analysis:** Use the provided visualization functions to gain insights into the distribution of data sources and explore the collected dataset.
 
-  <h2>Acknowledgements</h2>
+6. **Model Training:** Utilize the ScrapeditDataset as a DataLoader for training machine learning models. Integrate it with PyTorch's DataLoader for efficient batch processing and model training.
+7. **Getting models:** Added functionality includes getting known models, by default it freezes non classifier layers
+```
+from scrapeddit import models
+model1 = models.get_efficient(device = True) # efficient net model
+model2 = models.get_vision_model('vgg16', device = True) # Get any model that is available in torchvision.models
+```
+8. **Visualization:** Two types of visualization are 
+    6.1 **show_images:** Uses list of links of images to fetch image from the sources and display them accordingly
+    ```
+    from scrapeddit import showit
+    showit.show_images([list of links] figsize = (10,10), max_images = 24)
+    ```
+    
+    6.2 **sample_batch:** Shows a batch of image data from a dataloader
+    ```
+    from scrapeddit.showit import show_batch
+    sample_batch = next(iter(train_dataloader)) # Getting a batch of data
+    show_batch(sample_batch = sample_batch, max = 100, figsize = (15,15))
+    ```
+    
+## Requirements
 
-  <ul>
-    <li><a href="https://praw.readthedocs.io/en/latest/">PRAW</a>: The Python Reddit API Wrapper</li>
-    <li><a href="https://github.com/tqdm/tqdm">tqdm</a>: A Fast, Extensible Progress Bar for Python and CLI</li>
-    <li><a href="https://python-pillow.org/">Pillow</a>: The Python Imaging Library</li>
-  </ul>
+- Python 3.x
+- PRAW
+- pandas
+- requests
+- matplotlib
+- Pillow
+- torch
+- torchvision
+- tqdm
 
-  <h2>License</h2>
-
-  <p>This project is licensed under the MIT License. See the <code>LICENSE</code> file for details.</p>
-</body>
-</html>
