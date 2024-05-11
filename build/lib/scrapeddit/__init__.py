@@ -1,1 +1,1 @@
-from .main import Dataset, redditdl, scrapedit, showit, transforms
+import Dataset, redditdl, scrapedit, showit, transforms
