@@ -1,3 +1,29 @@
+from datetime import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sb
+import praw
+import pandas as pd
+from tqdm import tqdm
+import requests
+from PIL import Image
+from torchvision import transforms
+from io import BytesIO
+import numpy as np
+import seaborn as sns
+from collections import Counter
+
+import torch
+from torch.utils.data import Dataset, DataLoader
+import requests
+from PIL import Image
+from io import BytesIO
+import numpy as np
+from tqdm import tqdm
+import torchvision.transforms as transforms
+from torchinfo import summary
+import math
+
 def show_images(links_, title = None, figsize=(15,15), sub_title=None, noframe=True, max_col = 6, max_size=500, max_images = None, fontsize = 10, **kwargs):
   transform = transforms.ToTensor()
   if isinstance(links_, str): links = [links_]
@@ -32,7 +58,7 @@ def show_images(links_, title = None, figsize=(15,15), sub_title=None, noframe=T
       if img_tensor.shape[0] == 3: img_tensor = img_tensor.permute(1, 2, 0)
       np_image = np.array(img_tensor)
       if sub_title:
-        word = sub_title[i] if len(sub_title[i]) <= 45 else ""
+        word = sub_title[i] if len(sub_title[i]) <= 45 else sub_title[i][:30] + '...'
         axes[i].set_title(word, fontsize = fontsize)
       axes[i].imshow(np_image, **kwargs)
     except: pass
@@ -45,7 +71,7 @@ def show_images(links_, title = None, figsize=(15,15), sub_title=None, noframe=T
   plt.show()
 
 
-def show_batch(sample_batch, max = 25, X = 'image', y = 'y', cmap=None, **kwargs):
+def show_batch(sample_batch, max = 25, X = 'image', y = 'y', cmap=None, figsize = (5,5), **kwargs):
   if max:
     images = sample_batch[X][:max]
     labels = sample_batch[y][:max]
@@ -57,7 +83,7 @@ def show_batch(sample_batch, max = 25, X = 'image', y = 'y', cmap=None, **kwargs
   row = int(math.sqrt(img_len))
   img_len = row ** 2
 
-  fig, axes = plt.subplots(row, row, figsize=(25,25))
+  fig, axes = plt.subplots(row, row, figsize=figsize)
   axes = axes.flatten()
 
   for i in range(img_len):

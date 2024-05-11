@@ -7,8 +7,8 @@ with open(path.join(working_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='scrapeddit', # name of packe which will be package dir below project
-    version='0.2.0',
-    url='https://github.com/Mafaz03/ReditScraper',
+    version='0.3.0',
+    url='https://github.com/Mafaz03/scrapeddit',
     author='Mafaz03',
     author_email='mohdmafaz200303@gmail.com',
     description='Simple test package',

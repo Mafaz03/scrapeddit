@@ -1,11 +1,8 @@
 import praw
 
-class InvalidSubreddit(Exception):
-    pass
-class RestrictedSubreddit(Exception):
-    pass
-class AuthFailed(Exception):
-   pass
+class InvalidSubreddit(Exception): pass
+class RestrictedSubreddit(Exception): pass
+class AuthFailed(Exception): pass
 class IncompleteAuth(Exception): pass
    
 auths = []
@@ -21,5 +18,6 @@ def auth_reddit(client_id, client_secret, username, password, redirect_uri, user
   sub = reddit.subreddit('aww')
   try: sub_type = sub.subreddit_type
   except: raise InvalidSubreddit("Invalid Authentication, please recheck and try again")
-  print(f"Authentication was successful, auth stack: {len(auths)}")
   auths.append(reddit)
+  print(f"Authentication was successful, auth stack: {len(auths)}")
+  

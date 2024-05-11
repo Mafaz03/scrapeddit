@@ -2,10 +2,9 @@ from tqdm import tqdm
 import praw
 from datetime import datetime
 import pandas as pd
-from authentication import *
-import authentication
-
-auths = authentication.auths[0]
+from scrapeddit import authentication
+from scrapeddit.authentication import *
+auths = authentication.auths
 
 def scrape_reddit(subreddit: str, limit = 10, sortby = 'year', show_safe = None):
   if len(auths) == 0: raise IncompleteAuth("Complete Authentication by calling `authentication.auth_reddit` before proceeding")

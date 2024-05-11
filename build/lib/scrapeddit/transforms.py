@@ -1,3 +1,5 @@
+from PIL import Image
+
 class ResizeWithPadding(object):
   def __init__(self, size):
     self.size = size

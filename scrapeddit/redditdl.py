@@ -23,9 +23,9 @@ import numpy as np
 from tqdm import tqdm
 import torchvision.transforms as transforms
 from torchinfo import summary
-from authentication import *
-import authentication
-auths = authentication.auths[0]
+from scrapeddit import authentication
+from scrapeddit.authentication import *
+auths = authentication.auths
 
 from PIL import UnidentifiedImageError
 
@@ -74,7 +74,7 @@ class ScrapeditDataset(Dataset):
     self.ds_count = dict(Counter(z))
 
   def __call__(self):
-    print(f"Out of {len(self.subreddit) * self.limit}, f{len(self.colated_ds)} were able to scrape")
+    print(f"Out of {len(self.subreddit) * self.limit}, {len(self.colated_ds)} were able to scrape")
     plt.bar(self.ds_count.keys(), self.ds_count.values())
     plt.title('Distribution of Data Sources')
     plt.xlabel('Data Sources')
