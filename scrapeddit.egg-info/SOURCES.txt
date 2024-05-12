@@ -1,0 +1,15 @@
+LICENSE.txt
+README.md
+setup.py
+scrapeddit/__init__.py
+scrapeddit/authentication.py
+scrapeddit/models.py
+scrapeddit/redditdl.py
+scrapeddit/scrapeonce.py
+scrapeddit/showit.py
+scrapeddit/transforms.py
+scrapeddit.egg-info/PKG-INFO
+scrapeddit.egg-info/SOURCES.txt
+scrapeddit.egg-info/dependency_links.txt
+scrapeddit.egg-info/requires.txt
+scrapeddit.egg-info/top_level.txt
