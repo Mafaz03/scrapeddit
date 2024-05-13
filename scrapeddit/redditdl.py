@@ -26,11 +26,11 @@ from torchinfo import summary
 from scrapeddit import authentication
 from scrapeddit.authentication import *
 auths = authentication.auths
-
+import random
 from PIL import UnidentifiedImageError
 
 class ScrapeditDataset(Dataset):
-  def __init__(self, subreddit: list, limit=10, sortby='year', show_safe=None, max_size=500, transform=None):
+  def __init__(self, subreddit: list, limit=10, sortby='year', show_safe=None, max_size=500, transform=None, upsample = False):
     if len(auths) == 0: raise IncompleteAuth("Complete Authentication by calling `authentication.auth_reddit` before proceeding")
     reddit = auths[0]
     if transform: self.transform = transform
@@ -60,21 +60,26 @@ class ScrapeditDataset(Dataset):
         self.result.append(self.d)
       self.results[r] = self.result
 
-    self.colated_ds = []
+    self.collated_ds = []
     print(f"Collecting Images from {len(self.subreddit)} subreddits")
     for r in self.subreddit:
       for image in tqdm(self.results[r], total = len(self.results)) :
         try:
           response = requests.get(image['image'])
           pil_image = Image.open(BytesIO(response.content))
-          self.colated_ds.append([pil_image, r])
+          self.collated_ds.append([pil_image, r])
         except: pass
 
-    z = [i[1] for i in self.colated_ds]
+    z = [i[1] for i in self.collated_ds]
     self.ds_count = dict(Counter(z))
 
+    if upsample: 
+      print(f"Before upsample, size of dataset: {len(self.collated_ds)}")
+      self.collated_ds = upsample(self.collated_ds)
+      print(f"After upsample, size of dataset: {len(self.collated_ds)}")
+
   def __call__(self):
-    print(f"Out of {len(self.subreddit) * self.limit}, {len(self.colated_ds)} were able to scrape")
+    print(f"Out of {len(self.subreddit) * self.limit}, {len(self.collated_ds)} were able to scrape")
     plt.bar(self.ds_count.keys(), self.ds_count.values())
     plt.title('Distribution of Data Sources')
     plt.xlabel('Data Sources')
@@ -85,10 +90,10 @@ class ScrapeditDataset(Dataset):
     plt.show()
 
   def __len__(self):
-    return len(self.colated_ds)
+    return len(self.collted_ds)
 
   def __getitem__(self, idx):
-    pil_image, y = self.colated_ds[idx]
+    pil_image, y = self.collated_ds[idx]
     try:
       pil_image.thumbnail((self.max_size, self.max_size), Image.LANCZOS)
       if pil_image.mode != 'RGB': pil_image = pil_image.convert('RGB')
@@ -98,3 +103,23 @@ class ScrapeditDataset(Dataset):
       return {'image': np_image, 'y': y}
     except UnidentifiedImageError:
       return None
+
+def upsample(collated_ds):
+  labels = [i[1] for i in collated_ds]
+  labels_idx = {}
+  for i, label in enumerate(labels):
+    if label not in labels_idx:
+      labels_idx[label] = []
+    labels_idx[label].append(i)
+
+  count_dict = {i: len(labels_idx[i]) for i in labels_idx}
+  max_key = max(count_dict, key=count_dict.get)
+  to_sample = [key for key in list(count_dict.keys()) if key != max_key]
+  for i in to_sample:
+    temp = []
+    for k, j in enumerate(collated_ds):
+      if collated_ds[k][1] == i:
+        temp.append(collated_ds[k])
+    extra_sample = random.choices(temp, k=count_dict[max_key]-count_dict[i])
+    collated_ds += extra_sample
+  return collated_ds
